@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import { Loading } from './Loading';
+
+const SECURITY_CODE = 'paradigma';
 class ClassState extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            error: false,
-            loading: false,
+          value: '',
+          error: false,
+          loading: false,
         }
     }
     UNSAFE_componentWillMount() {
@@ -23,7 +26,11 @@ class ClassState extends Component {
           setTimeout(() => {
             console.log("Doing the validation");
     
-            this.setState( { loading: false } );
+            if (SECURITY_CODE === this.state.value) {
+              this.setState( { error: false, loading: false } );
+            }else {
+              this.setState( { error: true, loading: false } );
+            }
     
             console.log("Finishing the validation");
           }, 3000);
@@ -31,20 +38,28 @@ class ClassState extends Component {
       }
     
     render() {
+      const { error, loading, value } = this.state;
         return (
             <div>
                 <h2>Eliminar {this.props.name}</h2>
                 <p>Por favor, escribe el codigo de seguridad.</p>
 
-                {this.state.error && (
+                {(error && !loading )&& (
                     <p>Error: el codigo es incorrecto</p>
                 )}
-                {this.state.loading && (
+                {loading && (
                     <Loading />
                 )}
 
-                <input type="text" placeholder="Codigo de seguridad"/>
-                <button onClick={() => this.setState({ error: !this.state.error })}>Comprobar</button>
+                <input 
+                  type="text"  
+                  placeholder="Codigo de seguridad"
+                  value={value} 
+                  onChange={(event) => { 
+                    this.setState({value: event.target.value })
+                  }}
+                />
+                <button onClick={() => this.setState({ error: !error })}>Comprobar</button>
                 <button onClick={() => this.setState({ loading: true })}>Comprobar Loading</button>
             </div>
         )
